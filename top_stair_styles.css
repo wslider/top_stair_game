@@ -2,6 +2,10 @@ body {
     font-family: Magneto, Arial, sans-serif;
     text-align: center;
 }
+img {
+    max-width: 100vw;
+    align-content: center;
+}
 
 #gameDiv {
     margin-top: 50px;
