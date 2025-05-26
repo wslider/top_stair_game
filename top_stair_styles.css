@@ -1,1 +1,17 @@
-b {font-family: magneto , sans-serif ;}
+body {
+    font-family: Magneto, Arial, sans-serif;
+    text-align: center;
+}
+
+#gameDiv {
+    margin-top: 50px;
+}
+
+#throwResults p {
+    margin: 5px;
+}
+
+#roundSummary {
+    margin-top: 20px;
+    font-weight: bold;
+}

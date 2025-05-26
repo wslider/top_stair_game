@@ -9,13 +9,40 @@
 <body>
     <header>Welcome to TopStair</header>
 <main>
- <img src="https://topstair.wordpress.com/wp-content/uploads/2025/05/topstairsafteyshotwithgnomeandlogo_final8449374548228672331.jpg">   
+    
 </main>
-<article>
-<h2>History in the Making </h2>
-<h3>Since the building of the first pyramids, trends have come and gone. This is different.</h3>
-<p>This is <b>TopStair !</b></p>
-</article>
+
 <footer>Play The Game</footer>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopStair Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <img src="https://topstair.wordpress.com/wp-content/uploads/2025/05/topstairsafteyshotwithgnomeandlogo_final8449374548228672331.jpg">
+    <div id="startDiv">
+        <h1>Welcome to TopStair!</h1>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button id="startButton">Start Game</button>
+    </div>
+    <div id="gameDiv" style="display: none;">
+        <h1 id="roundDisplay"></h1>
+        <button id="throwButton">Throw Ball</button>
+        <div id="throwResults"></div>
+        <div id="roundSummary"></div>
+    </div>
+    <div id="endDiv" style="display: none;">
+        <h1>Game Over</h1>
+        <p id="playerTotal"></p>
+        <p id="virtualTotal"></p>
+        <p id="winner"></p>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
