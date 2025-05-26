@@ -8,6 +8,8 @@ let maxAttempts = 5;
 let totalRounds = 5;
 let isBonus = false;
 let bonusScore = 0;
+let playerRoundScores = [];
+let virtualRoundScores = [];
 
 // Start game when "Start Game" button is clicked
 document.getElementById('startButton').addEventListener('click', startGame);
@@ -26,11 +28,11 @@ function startGame() {
 // Start a new round
 function startRound(round) {
     currentAttempt = 0;
-    isBonus = false;
-    document.getElementById('roundDisplay').textContent = `Round ${round}, ${playerName}'s turn`;
+    playerRoundScores = [];
     document.getElementById('throwResults').innerHTML = '';
     document.getElementById('roundSummary').innerHTML = '';
     document.getElementById('throwButton').style.display = 'block';
+    document.getElementById('roundDisplay').textContent = `Round ${round}, ${playerName}'s turn`;
 }
 
 // Handle player's throw
@@ -38,12 +40,12 @@ document.getElementById('throwButton').addEventListener('click', playerThrow);
 
 function playerThrow() {
     if (currentAttempt < maxAttempts) {
-        let n = Math.floor(Math.random() * 13) + 1; // Random stair from 1 to 13
-        let points = calculatePoints(n);
-        displayThrowResult(playerName, n, points);
+        let result = simulateThrow();
+        displayThrowResult(playerName, result);
+        playerRoundScores.push(result.points);
         currentAttempt++;
         if (currentAttempt === maxAttempts) {
-            let maxPoints = getMaxScore(playerName);
+            let maxPoints = Math.max(...playerRoundScores);
             if (!isBonus) {
                 playerScores.push(maxPoints);
                 document.getElementById('roundSummary').textContent = `Your best score for this round: ${maxPoints}`;
@@ -59,39 +61,50 @@ function playerThrow() {
     }
 }
 
+// Simulate a throw with miss probability
+function simulateThrow() {
+    if (Math.random() < 0.6) { // 60% chance to miss
+        return { landed: false, stair: null, points: 0 };
+    } else {
+        let stair = Math.floor(Math.random() * 13) + 1;
+        let points = calculatePoints(stair);
+        return { landed: true, stair: stair, points: points };
+    }
+}
+
 // Calculate points for a given stair
 function calculatePoints(n) {
     return 2 * n - 4;
 }
 
 // Display throw result
-function displayThrowResult(player, n, points) {
+function displayThrowResult(player, result) {
     let resultDiv = document.createElement('p');
-    resultDiv.textContent = `${player} landed on stair ${n}, points: ${points}`;
+    if (!result.landed) {
+        let message = player === playerName ? "Your ball" : `${player.split(" ")[0]}'s ball`; // Shorten "The Master of TopStair" to "Master"
+        resultDiv.textContent = `${message} did not land on a stair. (0 points)`;
+        resultDiv.style.color = 'red'; // Highlight misses
+    } else {
+        resultDiv.textContent = `${player} landed on stair ${result.stair}, points: ${result.points}`;
+    }
     document.getElementById('throwResults').appendChild(resultDiv);
-}
-
-// Get max score for current round
-function getMaxScore(player) {
-    let throws = Array.from(document.getElementById('throwResults').children);
-    let scores = throws.map(el => parseInt(el.textContent.split('points: ')[1]));
-    return Math.max(...scores);
 }
 
 // Virtual player's turn
 function virtualTurn(round) {
+    document.getElementById('throwResults').innerHTML = ''; // Clear previous throws
     let virtualName = "The Master of TopStair";
     document.getElementById('roundDisplay').textContent = `Round ${round}, ${virtualName}'s turn`;
-    let virtualThrows = [];
+    virtualRoundScores = [];
     for (let i = 0; i < maxAttempts; i++) {
-        let n = Math.floor(Math.random() * 13) + 1;
-        let points = calculatePoints(n);
-        displayThrowResult(virtualName, n, points);
-        virtualThrows.push(points);
+        let result = simulateThrow();
+        displayThrowResult(virtualName, result);
+        virtualRoundScores.push(result.points);
     }
-    let maxPoints = Math.max(...virtualThrows);
+    let maxPoints = Math.max(...virtualRoundScores);
     virtualScores.push(maxPoints);
     document.getElementById('roundSummary').textContent += ` | ${virtualName}'s best score: ${maxPoints}`;
+    updateScoreBoard(round);
     if (round < totalRounds) {
         currentRound++;
         setTimeout(() => startRound(currentRound), 2000); // Wait before next round
@@ -104,6 +117,14 @@ function virtualTurn(round) {
     }
 }
 
+// Update scoreboard after each round
+function updateScoreBoard(round) {
+    let roundScoresDiv = document.getElementById('roundScores');
+    let roundScoreP = document.createElement('p');
+    roundScoreP.textContent = `Round ${round}: ${playerName}: ${playerScores[round - 1]}, Master: ${virtualScores[round - 1]}`;
+    roundScoresDiv.appendChild(roundScoreP);
+}
+
 // Bonus round for player
 function bonusPlayerTurn() {
     isBonus = true;
@@ -112,14 +133,20 @@ function bonusPlayerTurn() {
     document.getElementById('roundSummary').innerHTML = '';
     document.getElementById('throwButton').style.display = 'block';
     currentAttempt = 0;
+    playerRoundScores = [];
 }
 
 // End game and show results
 function endGame() {
+    if (isBonus) {
+        let bonusP = document.createElement('p');
+        bonusP.textContent = `Bonus Round: ${playerName}: ${bonusScore}, Master: N/A`;
+        document.getElementById('roundScores').appendChild(bonusP);
+    }
+    let playerTotal = playerScores.reduce((a, b) => a + b, 0) + (isBonus ? bonusScore : 0);
+    let virtualTotal = virtualScores.reduce((a, b) => a + b, 0);
     document.getElementById('gameDiv').style.display = 'none';
     document.getElementById('endDiv').style.display = 'block';
-    let playerTotal = playerScores.reduce((a, b) => a + b, 0) + bonusScore;
-    let virtualTotal = virtualScores.reduce((a, b) => a + b, 0);
     document.getElementById('playerTotal').textContent = `${playerName}'s total score: ${playerTotal}`;
     document.getElementById('virtualTotal').textContent = `The Master of TopStair's total score: ${virtualTotal}`;
     let winner = playerTotal > virtualTotal ? playerName : (playerTotal < virtualTotal ? 'The Master of TopStair' : 'Tie');
