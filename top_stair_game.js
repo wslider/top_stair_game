@@ -109,10 +109,10 @@ function virtualTurn(round) {
         currentRound++;
         setTimeout(() => startRound(currentRound), 2000); // Wait before next round
     } else {
-        if (playerScores.includes(7)) {
+        if (playerScores.includes(12)) {
             bonusPlayerTurn();
         }
-        else if (playerScores [playerScores.length - 1] >= 20) {
+        else if (playerScores [playerScores.length - 1] >= 22) {
             bonusPlayerTurn();
         }
        else {
