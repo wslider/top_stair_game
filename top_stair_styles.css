@@ -1,4 +1,6 @@
 body {
+    display:flexbox;
+    flex-direction: column;
     font-family: Arial, sans-serif;
     text-align: center;
 }
