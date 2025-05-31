@@ -1,0 +1,5 @@
+body {
+    background-color: #1c2526; /* Dark grayish cyan */
+    color: #d3d3d3; /* Light gray */
+    transition: background-color 0.5s ease, color 0.5s ease;
+}

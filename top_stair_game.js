@@ -11,8 +11,34 @@ let bonusScore = 0;
 let playerRoundScores = [];
 let virtualRoundScores = [];
 
+// Function to switch stylesheets based on time
+function updateColorScheme() {
+    const hour = new Date().getHours();
+    const stylesheet = document.getElementById('theme-stylesheet');
+
+    if (hour >= 15 && hour < 21) { // Evening (3PM - 9PM)
+        stylesheet.href = 'evening.css';
+    } else if (hour >= 21 || hour < 6) { // Night (9PM - 6AM)
+        stylesheet.href = 'night.css';
+    } else {
+        // For daytime, fall back to daytime.css
+        stylesheet.href = '';
+    }
+}
+
 // Start game when "Start Game" button is clicked
 document.getElementById('startButton').addEventListener('click', startGame);
+
+// Modified DOMContentLoaded to include updateColorScheme
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing event listener for startButton
+    document.getElementById('startButton').addEventListener('click', startGame);
+    // Initialize color scheme on page load
+    updateColorScheme();
+});
+
+// Update color scheme every minute
+setInterval(updateColorScheme, 60000);
 
 function startGame() {
     playerName = document.getElementById('nameInput').value;
@@ -50,7 +76,7 @@ function playerThrow() {
                 playerScores.push(maxPoints);
                 document.getElementById('roundSummary').textContent = `Your best score for this round: ${maxPoints}`;
                 document.getElementById('throwButton').style.display = 'none';
-                setTimeout(() => virtualTurn(currentRound), 2000); // Wait before virtual turn
+                setTimeout(() => virtualTurn(currentRound), 2000);
             } else {
                 bonusScore = maxPoints;
                 document.getElementById('roundSummary').textContent = `Your bonus score: ${maxPoints}`;
@@ -63,7 +89,7 @@ function playerThrow() {
 
 // Simulate a throw with miss probability
 function simulateThrow() {
-    if (Math.random() < 0.6) { // 60% chance to miss
+    if (Math.random() < 0.6) {
         return { landed: false, stair: null, points: 0 };
     } else {
         let stair = Math.floor(Math.random() * 13) + 1;
@@ -81,9 +107,9 @@ function calculatePoints(n) {
 function displayThrowResult(player, result) {
     let resultDiv = document.createElement('p');
     if (!result.landed) {
-        let message = player === playerName ? "Your ball" : `${player.split(" ")[0]}'s ball`; // Shorten "The Master of TopStair" to "Master"
+        let message = player === playerName ? "Your ball" : `${player.split(" ")[0]}'s ball`;
         resultDiv.textContent = `${message} did not land on a stair. (0 points)`;
-        resultDiv.style.color = 'red'; // Highlight misses
+        resultDiv.style.color = 'red';
     } else {
         resultDiv.textContent = `${player} landed on stair ${result.stair}, points: ${result.points}`;
     }
@@ -92,7 +118,7 @@ function displayThrowResult(player, result) {
 
 // Virtual player's turn
 function virtualTurn(round) {
-    document.getElementById('throwResults').innerHTML = ''; // Clear previous throws
+    document.getElementById('throwResults').innerHTML = '';
     let virtualName = "The Master of TopStair";
     document.getElementById('roundDisplay').textContent = `Round ${round}, ${virtualName}'s turn`;
     virtualRoundScores = [];
@@ -107,15 +133,13 @@ function virtualTurn(round) {
     updateScoreBoard(round);
     if (round < totalRounds) {
         currentRound++;
-        setTimeout(() => startRound(currentRound), 2000); // Wait before next round
+        setTimeout(() => startRound(currentRound), 2000);
     } else {
         if (playerScores.includes(12)) {
             bonusPlayerTurn();
-        }
-        else if (playerScores [playerScores.length - 1] >= 22) {
+        } else if (playerScores[playerScores.length - 1] >= 22) {
             bonusPlayerTurn();
-        }
-       else {
+        } else {
             endGame();
         }
     }
