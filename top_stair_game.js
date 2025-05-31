@@ -103,19 +103,20 @@ function calculatePoints(n) {
     return 2 * n - 4;
 }
 
-// Display throw result
+//display throw result
+
 function displayThrowResult(player, result) {
     let resultDiv = document.createElement('p');
     if (!result.landed) {
         let message = player === playerName ? "Your ball" : `${player.split(" ")[0]}'s ball`;
         resultDiv.textContent = `${message} did not land on a stair. (0 points)`;
-        resultDiv.style.color = 'red';
+        const hour = new Date().getHours();
+        resultDiv.style.color = (hour >= 15 && hour < 21) ? '#ff6666' : (hour >= 21 || hour < 6) ? '#ff6666' : 'red'; // Theme-specific miss color
     } else {
         resultDiv.textContent = `${player} landed on stair ${result.stair}, points: ${result.points}`;
     }
     document.getElementById('throwResults').appendChild(resultDiv);
 }
-
 // Virtual player's turn
 function virtualTurn(round) {
     document.getElementById('throwResults').innerHTML = '';
