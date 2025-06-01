@@ -16,7 +16,7 @@ function updateColorScheme() {
     const hour = new Date().getHours();
     const stylesheet = document.getElementById('theme-stylesheet');
 
-    if (hour >= 15 && hour < 21) { // Evening (3PM - 9PM)
+    if (hour >= 17 && hour < 21) { // Evening (5PM - 9PM)
         stylesheet.href = 'evening.css';
     } else if (hour >= 21 || hour < 6) { // Night (9PM - 6AM)
         stylesheet.href = 'night.css';
