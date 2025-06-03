@@ -17,13 +17,13 @@ img {
 button {
 font-size:20px;
 font-weight:bold;
-width:25vw;
+width:50vw;
 height:40px;
 }
 #nameInput {
 font-size:20px;
 font-weight:bold;
-width:25vw;      
+width:60vw;      
 }
 
 #gameDiv {
