@@ -11,6 +11,15 @@ let bonusScore = 0;
 let playerRoundScores = [];
 let virtualRoundScores = [];
 
+let xpPoint = 0;
+
+// Locations to develop later to change game dynamics 
+// gaurabHouse = distractions
+// theMoon = less gravity (higher throws, but greater miss rate)
+// mammothCave = cave monsters
+// iceland = 
+let locations = [gaurabHouse, theMoon, mammothCave, iceland]; 
+
 // Function to switch stylesheets based on time
 function updateColorScheme() {
     const hour = new Date().getHours();
