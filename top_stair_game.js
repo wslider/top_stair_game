@@ -18,23 +18,22 @@ let isBonus = false;
 let bonusScore = 0;
 let playerRoundScores = [];
 let virtualRoundScores = [];
-let xpPoint = 0;
-let currentLocation;
 
-// Locations with unique mechanics
-const locations = [
-    { name: 'Gaurab House', missProbability: 0.7, maxStairs: 13, pointMultiplier: 2, description: 'Distractions increase miss chance.' },
-    { name: 'The Moon', missProbability: 0.65, maxStairs: 20, pointMultiplier: 2, description: 'Lower gravity allows higher throws.' },
-    { name: 'Mammoth Cave', missProbability: 0.6, maxStairs: 13, pointMultiplier: 2, monsterChance: 0.1, description: 'Cave monsters may interfere.' },
-    { name: 'Iceland', missProbability: 0.6, maxStairs: 13, pointMultiplier: 1.5, description: 'Icy stairs reduce points.' }
-];
-
-// Theme update based on time of day
+// Function to switch stylesheets based on time
 function updateColorScheme() {
     const hour = new Date().getHours();
-    document.documentElement.className = 
-        (hour >= 17 && hour < 21) ? 'evening' : 
-        (hour >= 21 || hour < 6) ? 'night' : 'daytime';
+    const stylesheet = document.getElementById('theme-stylesheet');
+    if (!stylesheet) {
+        console.warn('Theme stylesheet not found');
+        return;
+    }
+    if (hour >= 17 && hour < 21) { // Evening (5PM - 9PM)
+        stylesheet.href = 'evening.css';
+    } else if (hour >= 21 || hour < 6) { // Night (9PM - 6AM)
+        stylesheet.href = 'night.css';
+    } else { // Daytime
+        stylesheet.href = 'daytime.css';
+    }
 }
 
 // Initialize game on page load
@@ -43,25 +42,39 @@ document.addEventListener('DOMContentLoaded', () => {
     if (startButton) {
         startButton.addEventListener('click', startGame);
     } else {
-        console.error('Start button not found in DOM');
+        console.error('Start button not found in DOM. Ensure element with id="startButton" exists.');
     }
-    updateColorScheme();
-    setInterval(updateColorScheme, 60000);
-    populateLocationSelect();
-});
 
-// Populate location dropdown
-function populateLocationSelect() {
-    const select = document.getElementById('locationSelect');
-    if (select) {
-        locations.forEach(location => {
-            const option = document.createElement('option');
-            option.value = location.name;
-            option.textContent = `${location.name} - ${location.description}`;
-            select.appendChild(option);
+    const restartButton = document.getElementById('restartButton');
+    if (restartButton) {
+        restartButton.addEventIndexOf('click', () => {
+            // Reset game state
+            playerName = '';
+            playerScores = [];
+            virtualScores = [];
+            currentRound = 1;
+            currentAttempt = 0;
+            isBonus = false;
+            bonusScore = 0;
+            playerRoundScores = [];
+            virtualRoundScores = [];
+            document.getElementById('nameInput').value = '';
+            document.getElementById('endDiv').style.display = 'none';
+            document.getElementById('startDiv').style.display = 'block';
+            document.getElementById('roundScores').innerHTML = '';
         });
     }
-}
+
+    const throwButton = document.getElementById('throwButton');
+    if (throwButton) {
+        throwButton.addEventListener('click', playerThrow);
+    } else {
+        console.warn('Throw button not found in DOM.');
+    }
+
+    updateColorScheme();
+    setInterval(updateColorScheme, 60000);
+});
 
 // Start the game
 function startGame() {
@@ -76,12 +89,10 @@ function startGame() {
         return;
     }
     
-    const selectedLocation = document.getElementById('locationSelect')?.value;
-    currentLocation = locations.find(loc => loc.name === selectedLocation) || locations[0];
-    
     document.getElementById('startDiv').style.display = 'none';
     document.getElementById('gameDiv').style.display = 'block';
-    document.getElementById('errorMessage').textContent = '';
+    document.getElementById('scoreBoard').style.display = 'block';
+    if (errorDiv) errorDiv.textContent = '';
     startRound(currentRound);
 }
 
@@ -92,13 +103,10 @@ function startRound(round) {
     document.getElementById('throwResults').innerHTML = '';
     document.getElementById('roundSummary').innerHTML = '';
     document.getElementById('throwButton').style.display = 'block';
-    document.getElementById('roundDisplay').textContent = `Round ${round}, ${playerName}'s turn at ${current locatieon.name}`;
-    document.getElementById('xpDisplay').textContent = `XP: ${xpPoint}`;
+    document.getElementById('roundDisplay').textContent = `Round ${round}, ${playerName}'s turn`;
 }
 
 // Handle player's throw
-document.getElementById('throwButton')?.addEventListener('click', playerThrow);
-
 function playerThrow() {
     if (currentAttempt < MAX_ATTEMPTS) {
         const result = simulateThrow();
@@ -123,32 +131,26 @@ function playerThrow() {
     }
 }
 
-// Simulate a throw based on location
+// Simulate a throw
 function simulateThrow() {
-    if (Math.random() < (currentLocation.monsterChance || 0) || Math.random() < currentLocation.missProbability) {
+    if (Math.random() < MISS_PROBABILITY) {
         return { landed: false, stair: null, points: 0 };
     }
-    const stair = Math.floor(Math.random() * currentLocation.maxStairs) + 1;
-    const points = currentLocation.pointMultiplier * stair - 4;
-    if (stair === BONUS_STAIR) xpPoint += 10;
-    if (points >= HIGH_SCORE_THRESHOLD) xpPoint += 15;
+    const stair = Math.floor(Math.random() * MAX_STAIRS) + 1;
+    const points = 2 * stair - 4;
     return { landed: true, stair, points };
-}
-
-// Calculate points for a given stair
-function calculatePoints(stair) {
-    return currentLocation.pointMultiplier * stair - 4;
 }
 
 // Display throw result
 function displayThrowResult(player, result) {
     const resultDiv = document.createElement('p');
-    resultDiv.className = result.landed ? 'throw-success' : 'throw-miss';
     if (!result.landed) {
         const message = player === playerName ? 'Your ball' : `${player.split(' ')[0]}'s ball`;
         resultDiv.textContent = `${message} did not land on a stair. (0 points)`;
+        resultDiv.className = 'throw-miss';
     } else {
         resultDiv.textContent = `${player} landed on stair ${result.stair}, points: ${result.points}`;
+        resultDiv.className = 'throw-success';
     }
     document.getElementById('throwResults').appendChild(resultDiv);
 }
@@ -157,7 +159,7 @@ function displayThrowResult(player, result) {
 function virtualTurn(round) {
     document.getElementById('throwResults').innerHTML = '';
     const virtualName = 'The Master of TopStair';
-    document.getElementById('roundDisplay').textContent = `Round ${round}, ${virtualName}'s turn at ${currentLocation.name}`;
+    document.getElementById('roundDisplay').textContent = `Round ${round}, ${virtualName}'s turn`;
     virtualRoundScores = [];
     
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
@@ -194,7 +196,7 @@ function updateScoreBoard(round) {
 // Bonus round for player
 function bonusPlayerTurn() {
     isBonus = true;
-    document.getElementById('roundDisplay').textContent = `Bonus Round at ${currentLocation.name}!`;
+    document.getElementById('roundDisplay').textContent = `Bonus Round!`;
     document.getElementById('throwResults').innerHTML = '';
     document.getElementById('roundSummary').innerHTML = '';
     document.getElementById('throwButton').style.display = 'block';
@@ -213,32 +215,11 @@ function endGame() {
     const playerTotal = playerScores.reduce((a, b) => a + b, 0) + (isBonus ? bonusScore : 0);
     const virtualTotal = virtualScores.reduce((a, b) => a + b, 0);
     
-    // Save high score
-    const highScores = JSON.parse(localStorage.getItem('highScores') || '[]');
-    highScores.push({ name: playerName, score: playerTotal, location: currentLocation.name, date: new Date().toISOString() });
-    localStorage.setItem('highScores', JSON.stringify(highScores));
-    
     document.getElementById('gameDiv').style.display = 'none';
+    document.getElementById('scoreBoard').style.display = 'block';
     document.getElementById('endDiv').style.display = 'block';
-    document.getElementById('playerTotal').textContent = `${playerName}'s total score: ${playerTotal} (XP: ${xpPoint})`;
+    document.getElementById('playerTotal').textContent = `${playerName}'s total score: ${playerTotal}`;
     document.getElementById('virtualTotal').textContent = `The Master of TopStair's total score: ${virtualTotal}`;
     const winner = playerTotal > virtualTotal ? playerName : (playerTotal < virtualTotal ? 'The Master of TopStair' : 'Tie');
     document.getElementById('winner').textContent = `Winner: ${winner}`;
-    
-    displayHighScores();
-}
-
-// Display high scores
-function displayHighScores() {
-    const highScores = JSON.parse(localStorage.getItem('highScores') || '[]');
-    const highScoresDiv = document.getElementById('highScores');
-    highScoresDiv.innerHTML = '<h3>High Scores</h3>';
-    highScores
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5)
-        .forEach(score => {
-            const scoreP = document.createElement('p');
-            scoreP.textContent = `${score.name}: ${score.score} (${score.location}, ${new Date(score.date).toLocaleDateString()})`;
-            highScoresDiv.appendChild(scoreP);
-        });
 }

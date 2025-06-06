@@ -1,0 +1,6 @@
+body {
+    background-color: #f0f0f0;
+    color: #000;
+}
+.throw-miss { color: red; }
+.throw-success { color: green; }
