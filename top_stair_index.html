@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TopStair Game</title>
     <link rel="stylesheet" href="top_stair_styles.css">
-    <link id="theme-stylesheet" rel="stylesheet" href="">
+    <link id="theme-stylesheet" rel="stylesheet" href="daytime.css">
 </head>
 <body>
-     <img src="https://topstair.wordpress.com/wp-content/uploads/2025/05/topstairsafteyshotwithgnomeandlogo_final8449374548228672331.jpg" alt="Top Stair Game stairs">
+    <img src="https://topstair.wordpress.com/wp-content/uploads/2025/05/topstairsafteyshotwithgnomeandlogo_final8449374548228672331.jpg" alt="Top Stair Game stairs">
     <div id="startDiv">
         <h1>Welcome to TopStair!</h1>
         <div class="startContainer">
-            <input type="text" id="nameInput" placeholder="Enter your name">
+            <input type="text" id="nameInput" placeholder="Enter your name" maxlength="20" aria-describedby="errorMessage">
             <button id="startButton">Start Game</button>
+            <div id="errorMessage" role="alert"></div>
         </div>
     </div>
     <div id="gameDiv" style="display: none;">
@@ -31,6 +32,7 @@
         <p id="playerTotal"></p>
         <p id="virtualTotal"></p>
         <p id="winner"></p>
+        <button id="restartButton">Play Again</button>
     </div>
     <img src="https://topstair.wordpress.com/wp-content/uploads/2021/01/avatar_1499446125647.jpg" alt="Gaurab playing Top Stair" width="200px">
     <script src="top_stair_game.js"></script>
