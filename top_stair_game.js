@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const restartButton = document.getElementById('restartButton');
     if (restartButton) {
-        restartButton.addEventIndexOf('click', () => {
+        restartButton.addEventListener('click', () => {
             // Reset game state
             playerName = '';
             playerScores = [];
