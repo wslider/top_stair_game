@@ -1,3 +1,4 @@
+/* 
 // Constants
 const MISS_PROBABILITY = 0.6;
 const MAX_STAIRS = 13;
